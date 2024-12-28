@@ -68,7 +68,7 @@ class Element:
             return f"<{self.tag}{attrs_str}></{self.tag}>"
 
         def render_content(items: Content) -> str:
-            if isinstance(items, (str, bytes, int, float, Element)):
+            if isinstance(items, Primitive):
                 return str(items)
             if isinstance(items, Iterable):
                 return "".join(render_content(x) for x in items)
