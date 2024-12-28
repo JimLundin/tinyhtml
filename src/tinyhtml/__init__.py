@@ -4,7 +4,7 @@ from typing import Self
 # Types - using Python 3.14's native forward refs and union operator
 type Primitive = str | bytes | int | float | Element
 type Content = Primitive | Iterable[Content]
-type Attr = str | int | float | bool | None
+type Attr = str | int | float | bool | None | dict[str, str]
 
 # HTML specification constants
 DEFAULT_ATTRS = {
@@ -20,7 +20,7 @@ class Element:
         self,
         tag: str,
         *content: Content,
-        void: bool,
+        void: bool = False,
         preserve_whitespace: bool = False,
         **attrs: Attr,
     ) -> None:
@@ -34,13 +34,15 @@ class Element:
                 self.attrs.setdefault(k, v)
 
         if void and content:
-            raise ValueError(f"Void element <{tag}> cannot have content")
+            msg = f"Void element <{tag}> cannot have content"
+            raise ValueError(msg)
 
         self.content = content
 
     def __call__(self, *content: Content) -> Self:
         if self.is_void and content:
-            raise ValueError(f"Void element <{self.tag}> cannot have content")
+            msg = f"Void element <{self.tag}> cannot have content"
+            raise ValueError(msg)
         self.content = content
         return self
 
@@ -72,7 +74,9 @@ class Element:
                 return str(items)
             if isinstance(items, Iterable):
                 return "".join(render_content(x) for x in items)
-            raise TypeError(f"Invalid content type: {type(items)}")
+
+            msg = f"Invalid content type: {type(items)}"
+            raise TypeError(msg)
 
         content_str = render_content(self.content)
 
@@ -89,74 +93,74 @@ def Doctype() -> str:
 
 # Pre-defined elements
 # Root and Metadata
-Html = Element("html", void=False)
-Head = Element("head", void=False)
-Body = Element("body", void=False)
-Title = Element("title", void=False)
+Html = Element("html")
+Head = Element("head")
+Body = Element("body")
+Title = Element("title")
 Meta = Element("meta", void=True)
 Link = Element("link", void=True)
-Style = Element("style", void=False, preserve_whitespace=True)
-Script = Element("script", void=False, preserve_whitespace=True)
+Style = Element("style", preserve_whitespace=True)
+Script = Element("script", preserve_whitespace=True)
 
 # Document Sections
-Header = Element("header", void=False)
-Nav = Element("nav", void=False)
-Main = Element("main", void=False)
-Article = Element("article", void=False)
-Section = Element("section", void=False)
-Aside = Element("aside", void=False)
-Footer = Element("footer", void=False)
+Header = Element("header")
+Nav = Element("nav")
+Main = Element("main")
+Article = Element("article")
+Section = Element("section")
+Aside = Element("aside")
+Footer = Element("footer")
 
 # Content Blocks
-Div = Element("div", void=False)
-P = Element("p", void=False)
+Div = Element("div")
+P = Element("p")
 Hr = Element("hr", void=True)
-Pre = Element("pre", void=False, preserve_whitespace=True)
-Code = Element("code", void=False, preserve_whitespace=True)
-Blockquote = Element("blockquote", void=False)
+Pre = Element("pre", preserve_whitespace=True)
+Code = Element("code", preserve_whitespace=True)
+Blockquote = Element("blockquote")
 
 # Text Level
-Span = Element("span", void=False)
-A = Element("a", void=False)
-Strong = Element("strong", void=False)
-Em = Element("em", void=False)
-I = Element("i", void=False)
-B = Element("b", void=False)
-U = Element("u", void=False)
-Sub = Element("sub", void=False)
-Sup = Element("sup", void=False)
+Span = Element("span")
+A = Element("a")
+Strong = Element("strong")
+Em = Element("em")
+I = Element("i")
+B = Element("b")
+U = Element("u")
+Sub = Element("sub")
+Sup = Element("sup")
 Br = Element("br", void=True)
 
 # Lists
-Ul = Element("ul", void=False)
-Ol = Element("ol", void=False)
-Li = Element("li", void=False)
-Dl = Element("dl", void=False)
-Dt = Element("dt", void=False)
-Dd = Element("dd", void=False)
+Ul = Element("ul")
+Ol = Element("ol")
+Li = Element("li")
+Dl = Element("dl")
+Dt = Element("dt")
+Dd = Element("dd")
 
 # Tables
-Table = Element("table", void=False)
-Caption = Element("caption", void=False)
-Thead = Element("thead", void=False)
-Tbody = Element("tbody", void=False)
-Tfoot = Element("tfoot", void=False)
-Tr = Element("tr", void=False)
-Th = Element("th", void=False)
-Td = Element("td", void=False)
+Table = Element("table")
+Caption = Element("caption")
+Thead = Element("thead")
+Tbody = Element("tbody")
+Tfoot = Element("tfoot")
+Tr = Element("tr")
+Th = Element("th")
+Td = Element("td")
 
 # Forms
-Form = Element("form", void=False)
-Label = Element("label", void=False)
+Form = Element("form")
+Label = Element("label")
 Input = Element("input", void=True)
-Button = Element("button", void=False)
-Select = Element("select", void=False)
-Option = Element("option", void=False)
-Textarea = Element("textarea", void=False, preserve_whitespace=True)
+Button = Element("button")
+Select = Element("select")
+Option = Element("option")
+Textarea = Element("textarea", preserve_whitespace=True)
 
 # Media
 Img = Element("img", void=True)
-Audio = Element("audio", void=False)
-Video = Element("video", void=False)
+Audio = Element("audio")
+Video = Element("video")
 Source = Element("source", void=True)
-Canvas = Element("canvas", void=False)
+Canvas = Element("canvas")
